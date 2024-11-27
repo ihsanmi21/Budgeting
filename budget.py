@@ -44,7 +44,7 @@ st.set_page_config(page_title="Transaction Tracker", layout="wide", page_icon="ð
 # Menampilkan Judul dan Pengantar
 st.title("ðŸ’° Transaction Tracker")
 st.markdown("""
-Welcome to the Transaction Tracker Jamil Jamblung!  
+Welcome to the Transaction Tracker Jamil!  
 This tool helps you record, track, and manage your income and expenses in an easy-to-use format.  
 Upload your transactions, or add new ones manually, and see your financial overview in real-time.
 """)
