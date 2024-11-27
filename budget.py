@@ -113,8 +113,6 @@ if not transactions.empty:
     st.dataframe(
         formatted_transactions.style.set_properties(
             **{'text-align': 'center'}
-        ).set_table_styles(
-            [{'selector': 'th', 'props': [('text-align', 'center')]}]
         )
     )
 
