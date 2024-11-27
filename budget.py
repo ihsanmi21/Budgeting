@@ -44,7 +44,7 @@ st.set_page_config(page_title="Transaction Tracker", layout="wide", page_icon="�
 # Menampilkan Judul dan Pengantar
 st.title("💰 Transaction Tracker")
 st.markdown("""
-Welcome to the Transaction Tracker!  
+Welcome to the Transaction Tracker Jamil Jamblung!  
 This tool helps you record, track, and manage your income and expenses in an easy-to-use format.  
 Upload your transactions, or add new ones manually, and see your financial overview in real-time.
 """)
@@ -70,7 +70,7 @@ with col2:
         categories = ['Rent', 'Groceries', 'Utilities', 'Entertainment', 'Other']
     category = st.selectbox('Select the category', categories)
 
-# Langkah 4: Input jumlah dengan format Rupiah secara otomatis
+# **Langkah 4**: Input jumlah dengan format Rupiah secara otomatis
 st.text_input(
     'Amount (Rupiah)',
     value="Rp 0" if "input_amount" not in st.session_state else st.session_state["input_amount"],
@@ -79,10 +79,10 @@ st.text_input(
     label_visibility="collapsed"
 )
 
-# Langkah 5: Pilih tanggal transaksi
+# **Langkah 5**: Pilih tanggal transaksi
 date = st.date_input('Date')
 
-# Langkah 6: Tombol untuk menambahkan transaksi
+# **Langkah 6**: Tombol untuk menambahkan transaksi
 if st.button('Add Transaction 📝'):
     # Konversi jumlah dari format Rupiah kembali ke angka
     try:
@@ -109,7 +109,7 @@ if not transactions.empty:
     formatted_transactions = transactions.copy()
     formatted_transactions['Amount'] = formatted_transactions['Amount'].apply(format_rupiah)
 
-    # Menampilkan DataFrame di Streamlit dengan kolom rata tengah
+    # Menampilkan DataFrame di Streamlit dengan kolom rata tengah dan desain tabel lebih rapih
     st.dataframe(
         formatted_transactions.style.set_properties(
             **{'text-align': 'center'}
@@ -147,5 +147,5 @@ st.markdown(f"### **Remaining Balance**: {format_rupiah(balance)}")
 # Informasi tambahan
 st.markdown("""
 ---
-For further assistance, please contact our support team at **support@transactiontracker.com**.
+For further assistance, please contact our support team at **jamiljamblung@gmail.com**.
 """)
