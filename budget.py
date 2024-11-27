@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import io
 
 # Fungsi untuk memformat angka ke format Rupiah
 def format_rupiah(amount):
@@ -17,21 +18,43 @@ def process_input():
         formatted_amount = format_rupiah(int(raw_amount))
         st.session_state["input_amount"] = formatted_amount  # Tampilkan input dalam format Rupiah
 
+# Fungsi untuk memuat data CSV
+def load_csv(file):
+    """Memuat file CSV dan mengonversinya ke DataFrame."""
+    try:
+        df = pd.read_csv(file)
+
+        # Pastikan kolom Amount diubah menjadi angka tanpa simbol Rp dan titik pemisah ribuan
+        if 'Amount' in df.columns:
+            df['Amount'] = df['Amount'].replace({r'Rp\s*': '', r'\.': ''}, regex=True)
+            df['Amount'] = pd.to_numeric(df['Amount'], errors='coerce')
+
+        st.session_state['transactions'] = df
+        st.success("CSV file loaded successfully!")
+    except Exception as e:
+        st.error(f"Error loading CSV file: {e}")
+
 # Inisialisasi transaksi di memori jika belum ada
 if 'transactions' not in st.session_state:
     st.session_state['transactions'] = pd.DataFrame(columns=['Category', 'Amount', 'Date', 'Type'])
 
-# Langkah 1: Pilih jenis transaksi (Income/Expense)
+# Langkah 1: Upload CSV file
+uploaded_file = st.file_uploader("Upload your transactions CSV", type=["csv"])
+
+if uploaded_file is not None:
+    load_csv(uploaded_file)
+
+# Langkah 2: Pilih jenis transaksi (Income/Expense)
 transaction_type = st.radio("Select the type of transaction", ['Income', 'Expense'])
 
-# Langkah 2: Pilih kategori transaksi
+# Langkah 3: Pilih kategori transaksi
 if transaction_type == 'Income':
     categories = ['Salary', 'Bonus', 'Investment', 'Other']
 else:
     categories = ['Rent', 'Groceries', 'Utilities', 'Entertainment', 'Other']
 category = st.selectbox('Select the category', categories)
 
-# Langkah 3: Input jumlah dengan format Rupiah secara otomatis
+# Langkah 4: Input jumlah dengan format Rupiah secara otomatis
 st.text_input(
     'Amount (Rupiah)',
     value="Rp 0" if "input_amount" not in st.session_state else st.session_state["input_amount"],
@@ -39,10 +62,10 @@ st.text_input(
     on_change=process_input
 )
 
-# Langkah 4: Pilih tanggal transaksi
+# Langkah 5: Pilih tanggal transaksi
 date = st.date_input('Date')
 
-# Langkah 5: Tombol untuk menambahkan transaksi
+# Langkah 6: Tombol untuk menambahkan transaksi
 if st.button('Add Transaction'):
     # Konversi jumlah dari format Rupiah kembali ke angka
     try:
@@ -76,6 +99,21 @@ if not transactions.empty:
         ).set_table_styles(
             [{'selector': 'th', 'props': [('text-align', 'center')]}]
         )
+    )
+
+    # Fitur untuk mengunduh tabel transaksi dalam format CSV
+    def convert_df(df):
+        """Konversi DataFrame ke CSV."""
+        return df.to_csv(index=False)
+
+    csv = convert_df(formatted_transactions)
+
+    # Tombol untuk mengunduh CSV
+    st.download_button(
+        label="Download Transactions as CSV",
+        data=csv,
+        file_name='transactions.csv',
+        mime='text/csv'
     )
 
 # Menghitung total pendapatan dan pengeluaran
