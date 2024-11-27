@@ -44,7 +44,7 @@ st.set_page_config(page_title="Transaction Tracker", layout="wide", page_icon="�
 # Menampilkan Judul dan Pengantar
 st.title("💰 Transaction Tracker")
 st.markdown("""
-Welcome to the Transaction Tracker Jamil Jamblung!  
+Welcome to the Transaction Tracker!  
 This tool helps you record, track, and manage your income and expenses in an easy-to-use format.  
 Upload your transactions, or add new ones manually, and see your financial overview in real-time.
 """)
@@ -56,34 +56,40 @@ if uploaded_file is not None:
     load_csv(uploaded_file)
 
 # **Desain layout menggunakan kolom**
-col1, col2 = st.columns(2)
+st.subheader("Add a New Transaction")
 
-with col1:
-    # Langkah 2: Pilih jenis transaksi (Income/Expense)
-    transaction_type = st.radio("Select the type of transaction", ['Income', 'Expense'])
+with st.form(key='transaction_form', clear_on_submit=True):
+    col1, col2 = st.columns(2)
 
-with col2:
-    # Langkah 3: Pilih kategori transaksi
-    if transaction_type == 'Income':
-        categories = ['Salary', 'Bonus', 'Investment', 'Other']
-    else:
-        categories = ['Rent', 'Groceries', 'Utilities', 'Entertainment', 'Other']
-    category = st.selectbox('Select the category', categories)
+    with col1:
+        # Langkah 2: Pilih jenis transaksi (Income/Expense)
+        transaction_type = st.radio("Select the type of transaction", ['Income', 'Expense'])
 
-# **Langkah 4**: Input jumlah dengan format Rupiah secara otomatis
-st.text_input(
-    'Amount (Rupiah)',
-    value="Rp 0" if "input_amount" not in st.session_state else st.session_state["input_amount"],
-    key="input_amount",
-    on_change=process_input,
-    label_visibility="collapsed"
-)
+    with col2:
+        # Langkah 3: Pilih kategori transaksi
+        if transaction_type == 'Income':
+            categories = ['Salary', 'Bonus', 'Investment', 'Other']
+        else:
+            categories = ['Rent', 'Groceries', 'Utilities', 'Entertainment', 'Other']
+        category = st.selectbox('Select the category', categories)
 
-# **Langkah 5**: Pilih tanggal transaksi
-date = st.date_input('Date')
+    # Langkah 4: Input jumlah dengan format Rupiah secara otomatis
+    st.text_input(
+        'Amount (Rupiah)',
+        value="Rp 0" if "input_amount" not in st.session_state else st.session_state["input_amount"],
+        key="input_amount",
+        on_change=process_input,
+        label_visibility="collapsed"
+    )
 
-# **Langkah 6**: Tombol untuk menambahkan transaksi
-if st.button('Add Transaction 📝'):
+    # Langkah 5: Pilih tanggal transaksi
+    date = st.date_input('Date')
+
+    # Tombol Submit
+    submit_button = st.form_submit_button(label='Add Transaction 📝')
+
+# Jika tombol Add Transaction ditekan
+if submit_button:
     # Konversi jumlah dari format Rupiah kembali ke angka
     try:
         final_amount = int(st.session_state["input_amount"].replace("Rp ", "").replace(".", ""))
@@ -147,5 +153,5 @@ st.markdown(f"### **Remaining Balance**: {format_rupiah(balance)}")
 # Informasi tambahan
 st.markdown("""
 ---
-For further assistance, please contact our support team at **jamiljamblung@gmail.com**.
+For further assistance, please contact our support team at **support@transactiontracker.com**.
 """)
