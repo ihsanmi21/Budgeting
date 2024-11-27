@@ -1,27 +1,23 @@
 import streamlit as st
 import pandas as pd
 
-# Fungsi untuk memformat angka ke format Rupiah secara manual
+# Fungsi untuk memformat angka ke format Rupiah
 def format_rupiah(amount):
     """Mengubah angka menjadi format Rupiah dengan titik sebagai pemisah ribuan."""
     amount_str = f"{int(amount):,}"  # Format angka dengan ribuan
     return f"Rp {amount_str.replace(',', '.')}"
 
-# Fungsi untuk memproses input secara real-time dan mengubahnya menjadi format Rupiah
-def process_and_format_input():
-    """Memproses input dari pengguna dan memperbarui input dengan format Rupiah."""
+# Fungsi untuk memproses input saat diketik
+def process_input():
+    """Memproses input dari pengguna untuk format langsung."""
     input_amount = st.session_state["input_amount"]  # Ambil input dari pengguna
-    input_amount = input_amount.replace(".", "")  # Hilangkan titik pemisah ribuan sebelumnya
+    raw_amount = input_amount.replace(".", "").replace("Rp ", "")  # Hilangkan titik dan simbol Rp
     
-    if input_amount.isdigit():  # Periksa apakah input valid (hanya angka)
-        formatted_amount = format_rupiah(input_amount)
-        st.session_state["input_amount"] = formatted_amount  # Perbarui input dengan format Rupiah
-    elif input_amount == "":
-        st.session_state["input_amount"] = ""
-    else:
-        st.warning("Please enter only numeric values.")
+    if raw_amount.isdigit():  # Periksa apakah input valid (hanya angka)
+        formatted_amount = format_rupiah(int(raw_amount))
+        st.session_state["input_amount"] = formatted_amount  # Tampilkan input dalam format Rupiah
 
-# Inisialisasi transaksi di memori
+# Inisialisasi transaksi di memori jika belum ada
 if 'transactions' not in st.session_state:
     st.session_state['transactions'] = pd.DataFrame(columns=['Category', 'Amount', 'Date', 'Type'])
 
@@ -38,9 +34,9 @@ category = st.selectbox('Select the category', categories)
 # Langkah 3: Input jumlah dengan format Rupiah secara otomatis
 st.text_input(
     'Amount (Rupiah)',
-    value="0" if "input_amount" not in st.session_state else st.session_state["input_amount"],
+    value="Rp 0" if "input_amount" not in st.session_state else st.session_state["input_amount"],
     key="input_amount",
-    on_change=process_and_format_input
+    on_change=process_input
 )
 
 # Langkah 4: Pilih tanggal transaksi
