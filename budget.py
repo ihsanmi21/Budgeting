@@ -31,12 +31,7 @@ def load_csv(file):
             df['Amount'] = df['Amount'].replace({r'Rp\s*': '', r'\.': ''}, regex=True)
             df['Amount'] = pd.to_numeric(df['Amount'], errors='coerce')
 
-        # Gabungkan data CSV dengan transaksi yang sudah ada
-        if 'transactions' in st.session_state:
-            st.session_state['transactions'] = pd.concat([st.session_state['transactions'], df], ignore_index=True)
-        else:
-            st.session_state['transactions'] = df
-            
+        st.session_state['transactions'] = df
         st.success("CSV file loaded successfully!")
     except Exception as e:
         st.error(f"Error loading CSV file: {e}")
@@ -129,12 +124,11 @@ if not transactions.empty:
 
     if st.button('Delete Selected Transactions 🗑️'):
         if selected_rows:
-            # Confirm Deletion
-            if st.confirm("Are you sure you want to delete the selected transactions?"):
-                selected_indices = [int(row.split(' ')[1])-1 for row in selected_rows]
-                st.session_state['transactions'] = st.session_state['transactions'].drop(selected_indices)
-                st.success("Selected transactions have been deleted!")
-                st.session_state['transactions'].reset_index(drop=True, inplace=True)
+            # Menghapus transaksi yang dipilih
+            selected_indices = [int(row.split(' ')[1])-1 for row in selected_rows]
+            st.session_state['transactions'] = st.session_state['transactions'].drop(selected_indices)
+            st.success("Selected transactions have been deleted!")
+            st.session_state['transactions'].reset_index(drop=True, inplace=True)
 
     # Tampilkan DataFrame yang sudah diformat
     st.dataframe(
