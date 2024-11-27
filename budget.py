@@ -1,14 +1,12 @@
 import streamlit as st
 import pandas as pd
 import io
-import plotly.express as px
 
 # Fungsi untuk memformat angka ke format Rupiah
 def format_rupiah(amount):
     """Mengubah angka menjadi format Rupiah dengan titik sebagai pemisah ribuan."""
     amount_str = f"{int(amount):,}"  # Format angka dengan ribuan
     return f"Rp {amount_str.replace(',', '.')}"
-
 
 # Fungsi untuk memproses input saat diketik
 def process_input():
@@ -36,56 +34,55 @@ def load_csv(file):
     except Exception as e:
         st.error(f"Error loading CSV file: {e}")
 
-
 # Inisialisasi transaksi di memori jika belum ada
 if 'transactions' not in st.session_state:
     st.session_state['transactions'] = pd.DataFrame(columns=['Category', 'Amount', 'Date', 'Type'])
 
-# **Tampilan yang lebih futuristik**
+# **Tampilan yang lebih menarik**
 st.set_page_config(page_title="Transaction Tracker", layout="wide", page_icon="💰")
 
 # Menampilkan Judul dan Pengantar
-st.title("💰 **Transaction Tracker**")
+st.title("💰 Transaction Tracker")
 st.markdown("""
-Welcome to the **Transaction Tracker**! 🚀  
-This tool helps you track your financial journey by recording both income and expenses.  
-Upload your transactions, or add new ones manually. Analyze your financial health with ease.
+Welcome to the Transaction Tracker Jamil Jamblung!  
+This tool helps you record, track, and manage your income and expenses in an easy-to-use format.  
+Upload your transactions, or add new ones manually, and see your financial overview in real-time.
 """)
 
-# **Langkah 1: Upload CSV file**
-uploaded_file = st.file_uploader("Upload your transactions CSV 📊", type=["csv"])
+# Langkah 1: Upload CSV file
+uploaded_file = st.file_uploader("Upload your transactions CSV", type=["csv"])
 
 if uploaded_file is not None:
     load_csv(uploaded_file)
 
-# **Desain layout menggunakan kolom responsif**
+# **Desain layout menggunakan kolom**
 col1, col2 = st.columns(2)
 
 with col1:
-    # **Langkah 2: Pilih jenis transaksi (Income/Expense)**
-    transaction_type = st.radio("Select the type of transaction", ['Income', 'Expense'], index=0)
+    # Langkah 2: Pilih jenis transaksi (Income/Expense)
+    transaction_type = st.radio("Select the type of transaction", ['Income', 'Expense'])
 
 with col2:
-    # **Langkah 3: Pilih kategori transaksi**
+    # Langkah 3: Pilih kategori transaksi
     if transaction_type == 'Income':
         categories = ['Salary', 'Bonus', 'Investment', 'Other']
     else:
         categories = ['Rent', 'Groceries', 'Utilities', 'Entertainment', 'Other']
     category = st.selectbox('Select the category', categories)
 
-# **Langkah 4: Input jumlah dengan format Rupiah secara otomatis**
+# **Langkah 4**: Input jumlah dengan format Rupiah secara otomatis
 st.text_input(
-    'Amount (Rupiah) 💸',
+    'Amount (Rupiah)',
     value="Rp 0" if "input_amount" not in st.session_state else st.session_state["input_amount"],
     key="input_amount",
     on_change=process_input,
     label_visibility="collapsed"
 )
 
-# **Langkah 5: Pilih tanggal transaksi**
-date = st.date_input('Transaction Date 📅')
+# **Langkah 5**: Pilih tanggal transaksi
+date = st.date_input('Date')
 
-# **Langkah 6: Tombol untuk menambahkan transaksi**
+# **Langkah 6**: Tombol untuk menambahkan transaksi
 if st.button('Add Transaction 📝'):
     # Konversi jumlah dari format Rupiah kembali ke angka
     try:
@@ -106,7 +103,7 @@ if st.button('Add Transaction 📝'):
 # Menampilkan transaksi yang sudah ditambahkan dengan pemformatan tabel lebih rapi
 transactions = st.session_state['transactions']
 if not transactions.empty:
-    st.write("### Your Transactions 📝")
+    st.write("### Your Transactions:")
 
     # Tampilkan tabel transaksi dengan jumlah dalam format Rupiah dan kolom rata tengah
     formatted_transactions = transactions.copy()
@@ -137,30 +134,18 @@ if not transactions.empty:
         use_container_width=True
     )
 
-    # **Grafik Pendapatan vs Pengeluaran**
-    total_income = transactions[transactions['Type'] == 'Income']['Amount'].sum()
-    total_expenses = transactions[transactions['Type'] == 'Expense']['Amount'].sum()
+# Menghitung total pendapatan dan pengeluaran
+total_income = transactions[transactions['Type'] == 'Income']['Amount'].sum()
+total_expenses = transactions[transactions['Type'] == 'Expense']['Amount'].sum()
 
-    balance = total_income - total_expenses
-
-    # Menampilkan grafik pengeluaran dan pendapatan
-    fig = px.bar(
-        x=['Income', 'Expense'],
-        y=[total_income, total_expenses],
-        labels={'x': 'Type of Transaction', 'y': 'Amount'},
-        title='Income vs Expenses Overview 💡',
-        color=['green', 'red'],
-        color_discrete_map={'Income': 'green', 'Expense': 'red'}
-    )
-    st.plotly_chart(fig)
-
-    # Menampilkan ringkasan saldo dengan tampilan yang lebih futuristik
-    st.markdown(f"### **Total Income**: {format_rupiah(total_income)}")
-    st.markdown(f"### **Total Expenses**: {format_rupiah(total_expenses)}")
-    st.markdown(f"### **Remaining Balance**: {format_rupiah(balance)}")
+# Menampilkan informasi saldo dengan desain yang lebih menarik
+balance = total_income - total_expenses
+st.markdown(f"### **Total Income**: {format_rupiah(total_income)}")
+st.markdown(f"### **Total Expenses**: {format_rupiah(total_expenses)}")
+st.markdown(f"### **Remaining Balance**: {format_rupiah(balance)}")
 
 # Informasi tambahan
 st.markdown("""
 ---
-For further assistance, feel free to reach out to us at **jamiljamblung@gmail.com** or check out our FAQ section.
+For further assistance, please contact our support team at **jamiljamblung@gmail.com**.
 """)
