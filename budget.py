@@ -8,7 +8,6 @@ def format_rupiah(amount):
     amount_str = f"{int(amount):,}"  # Format angka dengan ribuan
     return f"Rp {amount_str.replace(',', '.')}"
 
-
 # Fungsi untuk memproses input saat diketik
 def process_input():
     """Memproses input dari pengguna untuk format langsung."""
@@ -18,7 +17,6 @@ def process_input():
     if raw_amount.isdigit():  # Periksa apakah input valid (hanya angka)
         formatted_amount = format_rupiah(int(raw_amount))
         st.session_state["input_amount"] = formatted_amount  # Tampilkan input dalam format Rupiah
-
 
 # Fungsi untuk memuat data CSV
 def load_csv(file):
@@ -36,11 +34,9 @@ def load_csv(file):
     except Exception as e:
         st.error(f"Error loading CSV file: {e}")
 
-
 # Inisialisasi transaksi di memori jika belum ada
 if 'transactions' not in st.session_state:
     st.session_state['transactions'] = pd.DataFrame(columns=['Category', 'Amount', 'Date', 'Type'])
-
 
 # **Tampilan yang lebih menarik**
 st.set_page_config(page_title="Transaction Tracker", layout="wide", page_icon="💰")
@@ -59,7 +55,6 @@ uploaded_file = st.file_uploader("Upload your transactions CSV", type=["csv"])
 if uploaded_file is not None:
     load_csv(uploaded_file)
 
-
 # **Desain layout menggunakan kolom**
 col1, col2 = st.columns(2)
 
@@ -74,7 +69,6 @@ with col2:
     else:
         categories = ['Rent', 'Groceries', 'Utilities', 'Entertainment', 'Other']
     category = st.selectbox('Select the category', categories)
-
 
 # **Langkah 4**: Input jumlah dengan format Rupiah secara otomatis
 st.text_input(
@@ -116,21 +110,6 @@ if not transactions.empty:
     formatted_transactions['Amount'] = formatted_transactions['Amount'].apply(format_rupiah)
 
     # Menampilkan DataFrame di Streamlit dengan kolom rata tengah dan desain tabel lebih rapih
-    selected_rows = st.multiselect(
-        'Select transactions to delete',
-        options=[f"Row {i+1}" for i in range(len(formatted_transactions))],
-        format_func=lambda x: f"{formatted_transactions.iloc[int(x.split(' ')[1])-1]['Category']} - {formatted_transactions.iloc[int(x.split(' ')[1])-1]['Amount']}"
-    )
-
-    if st.button('Delete Selected Transactions 🗑️'):
-        if selected_rows:
-            # Menghapus transaksi yang dipilih
-            selected_indices = [int(row.split(' ')[1])-1 for row in selected_rows]
-            st.session_state['transactions'] = st.session_state['transactions'].drop(selected_indices)
-            st.success("Selected transactions have been deleted!")
-            st.session_state['transactions'].reset_index(drop=True, inplace=True)
-
-    # Tampilkan DataFrame yang sudah diformat
     st.dataframe(
         formatted_transactions.style.set_properties(
             **{'text-align': 'center'}
